@@ -21,7 +21,9 @@ echo "~~~ :jigsaw: Installing asdf plugins"
 while IFS="" read -r p || [ -n "$p" ]
 do
   plugin_name="${p%% *}"
+  plugin_version="${p#* }"
   asdf plugin-add "$plugin_name" || true
+  asdf reshim "$plugin_name" "$plugin_version" || true
 done < .tool-versions
 
 echo "~~~ :toolbox: Installing asdf tool versions"
