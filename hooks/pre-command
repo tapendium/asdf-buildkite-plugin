@@ -1,11 +1,27 @@
 #!/usr/bin/env bash
 set -ueo pipefail
 
+ASDF_VERSION="v0.11.1"
+path=$(echo "${BUILDKITE_PLUGIN_ASDF_PATH:-.}" | sed 's/^\///') # strip prefixed slashes
+
+function install_asdf() {
+  echo "~~~ :git: Cloning asdf"
+  git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch "$ASDF_VERSION" || true
+
+  # shellcheck source=/dev/null
+  . "$HOME"/.asdf/asdf.sh
+}
+
 echo "--- :wrench: Configuring tools with asdf"
 pushd "$path" || exit 1
 if [ ! -f ".tool-versions" ]; then
   echo "No .tool-versions found! Aborting."
   exit 1
+fi
+
+if ! command -v asdf &>/dev/null; then
+	echo "asdf not found. Installing"
+	install_asdf
 fi
 
 echo "~~~ :jigsaw: Installing asdf plugins"
@@ -19,7 +35,6 @@ done < .tool-versions
 
 echo "~~~ :toolbox: Installing asdf tool versions"
 asdf install
-
 
 popd
 
