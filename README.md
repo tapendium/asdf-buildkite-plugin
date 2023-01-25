@@ -10,7 +10,7 @@ Add the following to your `pipeline.yml`:
 steps:
   - command: yarn && yarn test
     plugins:
-      - byerobot/asdf#v1.2.2: ~
+      - tapendium/asdf#v1.2.2: ~
 ```
 
 `asdf` will look for a `.tool-versions` in your repo's root and install the plugins and tool versions listed there.
