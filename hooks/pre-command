@@ -1,8 +1,16 @@
 #!/usr/bin/env bash
 set -ueo pipefail
 
-ASDF_VERSION="v0.10.0"
+ASDF_VERSION="v0.11.1"
 path=$(echo "${BUILDKITE_PLUGIN_ASDF_PATH:-.}" | sed 's/^\///') # strip prefixed slashes
+
+function install_asdf() {
+  echo "~~~ :git: Cloning asdf"
+  git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch "$ASDF_VERSION" || true
+
+  # shellcheck source=/dev/null
+  . "$HOME"/.asdf/asdf.sh
+}
 
 echo "--- :wrench: Configuring tools with asdf"
 pushd "$path" || exit 1
@@ -11,11 +19,10 @@ if [ ! -f ".tool-versions" ]; then
   exit 1
 fi
 
-echo "~~~ :git: Cloning asdf"
-git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch "$ASDF_VERSION" || true
-
-# shellcheck source=/dev/null
-. "$HOME"/.asdf/asdf.sh
+if ! command -v asdf &>/dev/null; then
+	echo "asdf not found. Installing"
+	install_asdf
+fi
 
 echo "~~~ :jigsaw: Installing asdf plugins"
 while IFS="" read -r p || [ -n "$p" ]
@@ -27,10 +34,13 @@ done < .tool-versions
 echo "~~~ :toolbox: Installing asdf tool versions"
 asdf install
 
-if grep -q nodejs .tool-versions; then
-  echo "~~~ :yarn: Installing yarn"
-  npm i -g yarn
-fi
+echo "~~~ :jigsaw: Reshiming asdf plugins"
+while IFS="" read -r p || [ -n "$p" ]
+do
+  plugin_name="${p%% *}"
+  plugin_version="${p#* }"
+  asdf reshim "$plugin_name" "$plugin_version" || true
+done < .tool-versions
 
 popd
 
