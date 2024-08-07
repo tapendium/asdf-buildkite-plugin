@@ -10,7 +10,7 @@ Add the following to your `pipeline.yml`:
 steps:
   - command: npm ci
     plugins:
-      - tapendium/asdf#v1.0.0: ~
+      - tapendium/asdf#v1.1.0: ~
 ```
 
 `asdf` will look for a `.tool-versions` in your repo's root and install the plugins and tool versions listed there.

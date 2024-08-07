@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ueo pipefail
 
-ASDF_VERSION="v0.11.1"
+ASDF_VERSION="v0.14.0"
 path=$(echo "${BUILDKITE_PLUGIN_ASDF_PATH:-.}" | sed 's/^\///') # strip prefixed slashes
 
 function install_asdf() {
